@@ -3,9 +3,14 @@ import cors from 'cors';
 import { getUsers, createUser, isExistUser, deleteAll, blockAndUnblockUsers, checkLogin, checkBlock } from './database.js'
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3030;
 
-app.use(cors());
+app.use(cors({
+  "origin": "*",
+  "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+  "preflightContinue": false,
+  "optionsSuccessStatus": 204
+}));
 app.use(express.json());
 
 app.get('/users', async (req, res) => {
@@ -15,6 +20,7 @@ app.get('/users', async (req, res) => {
 })
 
 app.post('/login', async (req, res) => {
+    console.log('hello')
   const user = req.body;
   const existUser = await isExistUser(user.login, user.password);
   const blockCh = await checkBlock(user.login, 'blocked');
@@ -41,7 +47,7 @@ app.post('/registration', async (req, res) => {
     res.end();
   } else {
     res.json({ message: true});
-    await createUser(newUser.name, newUser.login, status.active, newUser.password);
+    await createUser(newUser.name, newUser.login, 'active', newUser.password);
     res.end();
   }
 });
@@ -73,5 +79,7 @@ app.post('/table/unlock', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`server is running on: http://localhost:${PORT}`);
+console.log(process.env)
+console.log(process.env.host)
+  console.log(`server is running on: ${PORT}`);
 });
